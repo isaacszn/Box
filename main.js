@@ -40,6 +40,7 @@ document.querySelector("body").onload = () => {
           dateData = doc.data.taskdate;
           note.style.display = 'none';
           todos.style.display = 'block';
+          console.log(doc.data.taskname, doc.data.taskdesc, doc.data.taskdate)
           
           // Creating elements
           let list = document.createElement('span');
@@ -57,9 +58,9 @@ document.querySelector("body").onload = () => {
           img.height = 25;
           list.className = 'todo';
           list.id = 'todo';
-          list.innerHTML = taskName.value;
+          list.innerHTML = taskName;
           date.className = 'todo-date';
-          date.innerHTML = dateData.value;
+          date.innerHTML = dateData;
           deleteButton.className = 'delete-btn';
           deleteButton.onclick = () => {
             flx.remove();
@@ -86,7 +87,8 @@ document.querySelector("body").onload = () => {
           console.log(taskName, taskDesc, dateData)
         });
       } else {
-        document.querySelector('.note').style.display = 'block';
+        note.style.display = 'block';
+        todos.style.display = 'none';
       }
     });
   } catch (error) {
