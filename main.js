@@ -9,7 +9,7 @@ const db = new Cocobase({
 //}
 
 document.querySelector("body").onload = () => {
-    // Importing elements needed
+  // Importing elements needed
   let greetingBox = document.getElementById('greeting');
   
   let greetArray = ['Hola', 'Hi', 'Hello', 'Good Day', 'Ahoy', 'Wagwan', 'What\'s up?', 'Howdy', 'Yo', 'How far', 'Ele way?'];
@@ -20,6 +20,78 @@ document.querySelector("body").onload = () => {
   
   // Modifying elements imported
   greetingBox.innerHTML = greeting + '! ' + '👋';
+  
+  // Another part of the code that loads saved tasks on Cocobase's DB
+  let taskName;
+  let taskDesc;
+  let dateData;
+  let todos = document.getElementById('todos');
+  let lists = document.getElementById('lists');
+  let note = document.getElementById('note');
+  
+  // Load tasks from the my Cocobase DB
+  try {
+    // write cocobase shit here
+    db.listDocuments('task').then((docs) => {
+      if (docs) {
+        docs.forEach((doc) => {
+          taskName = doc.data.taskname;
+          taskDesc = doc.data.taskdesc;
+          dateData = doc.data.taskdate;
+          note.style.display = 'none';
+          todos.style.display = 'block';
+          
+          // Creating elements
+          let list = document.createElement('span');
+          let date = document.createElement('span');
+          let deleteButton = document.createElement('button');
+          let flx = document.createElement('div');
+          let img = document.createElement('img');
+          let checkBox = document.createElement('input');
+          
+          // Giving properties
+          flx.id = 'flx';
+          flx.className = 'flx';
+          img.src = 'delete' + '.svg';
+          img.width = 25;
+          img.height = 25;
+          list.className = 'todo';
+          list.id = 'todo';
+          list.innerHTML = taskName.value;
+          date.className = 'todo-date';
+          date.innerHTML = dateData.value;
+          deleteButton.className = 'delete-btn';
+          deleteButton.onclick = () => {
+            flx.remove();
+          };
+          checkBox.type = 'checkbox';
+          checkBox.className = 'check-box';
+          checkBox.id = 'check-box';
+          checkBox.onclick = (e) => {
+            if (e.target.checked) {
+              flx.classList.add('disabled');
+            } else {
+              flx.classList.remove('disabled');
+            }
+          };
+          
+          
+          // Appending
+          deleteButton.append(img);
+          flx.append(list);
+          flx.append(deleteButton);
+          flx.append(checkBox);
+          list.append(date);
+          todos.append(flx);
+          console.log(taskName, taskDesc, dateData)
+        });
+      } else {
+        document.querySelector('.note').style.display = 'block';
+      }
+    });
+  } catch (error) {
+    throw error
+  }
 }
 
 document.querySelector('#dark-btn').addEventListener('click', () => {
@@ -157,10 +229,11 @@ document.querySelector('.add-taskbtn').addEventListener('click', () => {
   // Saving task to Cocobase
   try {
     // write cocobase shit here
-    db.createDocument('task', { taskname: taskName, taskdesc: taskDesc, taskdate: dateData });
+    db.createDocument('task', { taskname: taskName.value, taskdesc: taskDesc.value, taskdate: dateData.value });
   } catch (error) {
     throw error
   }
+  //console.log(taskName, taskDesc, dateData)
   
   //console.log(localStorage.getItem(taskName.value.trim()))
   
@@ -176,72 +249,3 @@ document.querySelector('.add-taskbtn').addEventListener('click', () => {
   taskDesc.value = '';
   dateData.value = '';
 })
-
-document.querySelector('body').addEventListener('load', () => {
-  let taskName;
-  let taskDesc;
-  let dateData;
-  
-  // Load tasks from the my Cocobase DB
-  try {
-    // write cocobase shit here
-    db.listDocuments('task').then((docs) => {
-      docs.forEach((doc) => {
-        taskName = doc.data.taskname;
-        taskDesc = doc.data.taskdesc;
-        dateData = doc.data.taskdate;
-      });
-    });
-  } catch (error) {
-    throw error
-  }
-  
-  let todos = document.getElementById('todos');
-  let lists = document.getElementById('lists');
-  let note = document.getElementById('note');
-  
-  // Creating elements
-  let list = document.createElement('span');
-  let date = document.createElement('span');
-  let deleteButton = document.createElement('button');
-  let flx = document.createElement('div');
-  let img = document.createElement('img');
-  let checkBox = document.createElement('input');
-  
-  // Giving properties
-  flx.id = 'flx';
-  flx.className = 'flx';
-  img.src = 'delete' + '.svg';
-  img.width = 25;
-  img.height = 25;
-  list.className = 'todo';
-  list.id = 'todo';
-  list.innerHTML = taskName.value.trim();
-  date.className = 'todo-date';
-  date.innerHTML = dateData.value.trim();
-  deleteButton.className = 'delete-btn';
-  deleteButton.onclick = () => {
-    flx.remove();
-  };
-  checkBox.type = 'checkbox';
-  checkBox.className = 'check-box';
-  checkBox.id = 'check-box';
-  checkBox.onclick = (e) => {
-    if (e.target.checked) {
-      flx.classList.add('disabled');
-    } else {
-      flx.classList.remove('disabled');
-    }
-  };
-  
-  
-  // Appending
-  deleteButton.append(img);
-  flx.append(list);
-  flx.append(deleteButton);
-  flx.append(checkBox);
-  list.append(date);
-  todos.append(flx);
-})
-
-console.log(Cocobase);
